@@ -11,7 +11,11 @@ server:
     keyStorePassword: changeit
     keyPassword: changeit
 management:
-  address: 0.0.0.0
+  server:
+    port: 9090
+    server: 0.0.0.0
+    ssl:
+      enabled: false
   security:
     enabled: false
 
