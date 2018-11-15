@@ -1,0 +1,25 @@
+logging:
+  config: classpath:logback.xml
+
+# lets listen on all ports to ensure we can be invoked from the pod IP
+server:
+  address: 0.0.0.0
+  port: 8443
+  ssl:
+    enabled: true
+    keyStore: ${OPENSHIFT_IDENTITYSTORE_PATH:classpath:ssl/keystore.jks}
+    keyStorePassword: changeit
+    keyPassword: changeit
+management:
+  address: 0.0.0.0
+  security:
+    enabled: false
+
+endpoints:
+  enabled: true
+  health:
+    enabled: true
+
+security:
+  basic:
+    enabled: false
