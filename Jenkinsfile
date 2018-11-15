@@ -5,6 +5,7 @@ openshift.withCluster() {
   echo "Starting Pipeline for ${APP_NAME}..."
   def projectBase = "${env.NAMESPACE}".replaceAll(/-build/, '')
   env.BUILD = "${projectBase}"
+  env.BC_NAME = "springboot-app-food"
 }
 
  pipeline {
@@ -66,7 +67,7 @@ openshift.withCluster() {
           script {
             openshift.withCluster() {
               openshift.withProject("${BUILD}") {
-                openshift.selector("bc", "${APP_NAME}").startBuild("--from-dir=oc-build").logs("-f")
+                openshift.selector("bc", "${BC_NAME}").startBuild("--from-dir=oc-build").logs("-f")
               }
             }
           }
