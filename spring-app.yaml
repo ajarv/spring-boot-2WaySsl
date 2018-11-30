@@ -1,0 +1,147 @@
+---
+  kind: "Template"
+  apiVersion: "v1"
+  metadata: 
+    name: "spring-app"
+    annotations: 
+      description: "Sample application written in Golang"
+      tags: "quickstart,golang"
+      iconClass: "icon-go-gopher"
+  labels: 
+    template: "spring-app"
+    app: "${APP_NAME}"
+  objects: 
+    - 
+      kind: "Service"
+      apiVersion: "v1"
+      metadata: 
+        name: "${APP_NAME}"
+        annotations: 
+          description: "Exposes and load balances the application pods"
+      spec: 
+        ports: 
+          - 
+            name: "web"
+            port: 8443
+            targetPort: 8443
+        selector: 
+          name: "${APP_NAME}"
+    - 
+      kind: "Route"
+      apiVersion: "v1"
+      metadata: 
+        name: "secure-passthru-${APP_NAME}"
+      spec: 
+        host: "${APPLICATION_DOMAIN}"
+        port:
+          targetPort: 8443
+        tls:
+          termination: passthrough
+        to:
+          kind: Service
+          name: "${APP_NAME}"
+          weight: 100
+        wildcardPolicy: None
+    - 
+      kind: "ImageStream"
+      apiVersion: "v1"
+      metadata: 
+        name: "${APP_NAME}"
+        annotations: 
+          description: "Keeps track of changes in the application image"
+    - 
+      kind: "BuildConfig"
+      apiVersion: "v1"
+      metadata: 
+        name: "${APP_NAME}"
+        annotations: 
+          description: "Defines how to build the application"
+      spec:
+        failedBuildsHistoryLimit: 5
+        nodeSelector: null
+        output:
+          to:
+            kind: ImageStreamTag
+            name: ${APP_NAME}:latest
+        postCommit: {}
+        resources: {}
+        runPolicy: Serial
+        source:
+          git:
+            uri: "${SOURCE_REPOSITORY_URL}"
+          type: Git
+        strategy:
+          sourceStrategy:
+            env:
+            - name: GIT_SSL_NO_VERIFY
+              value: "true"
+            from:
+              kind: ImageStreamTag
+              name: redhat-openjdk18-openshift:1.1
+              namespace: openshift
+          type: Source
+        successfulBuildsHistoryLimit: 5
+        triggers: 
+          - 
+            type: "ConfigChange"
+          - 
+            type: "GitHub"
+            github: 
+              secret: "${GITHUB_WEBHOOK_SECRET}"
+    - 
+      kind: "DeploymentConfig"
+      apiVersion: "v1"
+      metadata: 
+        name: "${APP_NAME}"
+        annotations: 
+          description: "Defines how to deploy the application server"
+      spec: 
+        strategy: 
+          type: "Recreate"
+        triggers: 
+          - 
+            type: "ImageChange"
+            imageChangeParams: 
+              automatic: true
+              containerNames: 
+                - "${APP_NAME}"
+              from: 
+                kind: "ImageStreamTag"
+                name: "${APP_NAME}:latest"
+          - 
+            type: "ConfigChange"
+        replicas: 1
+        selector: 
+          name: "${APP_NAME}"
+        template: 
+          metadata: 
+            name: "${APP_NAME}"
+            labels: 
+              name: "${APP_NAME}"
+          spec: 
+            containers: 
+              - 
+                name: "${APP_NAME}"
+                image: "${APP_NAME}"
+                ports: 
+                  - 
+                    containerPort: 8080
+  parameters: 
+    - 
+      name: "APP_NAME"
+      description: "Applicaiton Name"
+      value: "two-way"
+    - 
+      name: "SOURCE_REPOSITORY_URL"
+      description: "The URL of the repository with your application source code"
+      value: "https://aplsiscmp001.sempra.com/avashist/spring-boot-2WaySsl.git"
+    - 
+      name: "APPLICATION_DOMAIN"
+      description: "The exposed hostname that will route to the Beego service"
+      value: "two-way.raja.10.29.203.12.nip.io"
+    - 
+      name: "GITHUB_WEBHOOK_SECRET"
+      description: "Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted."
+      generate: "expression"
+      from: "[a-zA-Z0-9]{40}"
+
