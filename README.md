@@ -24,8 +24,8 @@ keytool -genkey -keyalg RSA -dname "cn=Mount San Jacinto, ou= DevOps, o=efficien
 
 ```sh
 oc delete secret ssl-truststore ssl-truststore-password
-oc create secret generic ssl-truststore --from-file=keystore.jks 
-oc create secret generic ssl-truststore-password --from-literal=password=${password}
+oc create secret generic ssl-keystore --from-file=keystore.jks 
+oc create secret generic ssl-keystore-password --from-literal=password=${password}
 ```
 
 ### Deploy the application
@@ -51,8 +51,9 @@ curl -k -X GET "https://${app_hostname}/greeting" -H "accept: */*"
 
 
 ```sh 
-
-oc new-app deployment-template.yaml -p SOURCE_REPOSITORY_URL=${git_repo} -p APPLICATION_DOMAIN="${app_hostname}" --build-env=GIT_SSL_NO_VERIFY=true
+oc new-app spring-app.yaml -p SOURCE_REPOSITORY_URL=${git_repo} -p APPLICATION_DOMAIN="${app_hostname}" 
+sleep 40
+curl -ivk -X GET "https://${app_hostname}/greeting" -H "accept: */*"
 
 ```
 
