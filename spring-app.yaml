@@ -119,8 +119,21 @@
             labels: 
               name: "${APP_NAME}"
           spec: 
+            volumes:
+              - name: ssl-keystore-volume
+                secret:
+                  defaultMode: 420
+                  secretName: ssl-keystore
             containers: 
               - 
+                env:
+                  - name: OPENSHIFT_IDENTITYSTORE_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        key: password
+                        name: ssl-keystore-password
+                  - name: OPENSHIFT_IDENTITYSTORE_PATH
+                    value: /var/run/secrets/java.io/ssl-truststore/cacerts
                 name: "${APP_NAME}"
                 image: "${APP_NAME}"
                 ports: 

@@ -8,8 +8,8 @@ server:
   ssl:
     enabled: true
     keyStore: ${OPENSHIFT_IDENTITYSTORE_PATH:classpath:ssl/keystore.jks}
-    keyStorePassword: changeit
-    keyPassword: changeit
+    keyStorePassword: ${OPENSHIFT_IDENTITYSTORE_PASSWORD:changeit}
+    keyPassword: ${OPENSHIFT_IDENTITYSTORE_PASSWORD:changeit}
 management:
   server:
     port: 9090
