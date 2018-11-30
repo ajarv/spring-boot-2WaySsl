@@ -28,10 +28,10 @@ oc create secret generic ssl-keystore --from-file=keystore.jks
 oc create secret generic ssl-keystore-password --from-literal=password=${password}
 ```
 
-### Deploy the application
+### App Settings
 
 ```sh
-app_name=twossl
+app_name=two-way
 git_repo=https://aplsiscmp001.sempra.com/avashist/spring-boot-2WaySsl.git
 project_display_name="$(echo ${USER} ${app_name}|sed -r 's/(^|-)(\w)/\U\2/g')"
 project_name="${USER}-${app_name}"
@@ -51,7 +51,7 @@ curl -k -X GET "https://${app_hostname}/greeting" -H "accept: */*"
 
 
 ```sh 
-oc new-app spring-app.yaml -p SOURCE_REPOSITORY_URL=${git_repo} -p APPLICATION_DOMAIN="${app_hostname}" 
+oc new-app spring-app.yaml -p SOURCE_REPOSITORY_URL=${git_repo} -p APPLICATION_DOMAIN="${app_hostname}" -p APP_NAME=${app_name} 
 sleep 40
 curl -ivk -X GET "https://${app_hostname}/greeting" -H "accept: */*"
 
