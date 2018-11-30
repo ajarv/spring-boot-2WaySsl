@@ -133,12 +133,16 @@
                         key: password
                         name: ssl-keystore-password
                   - name: OPENSHIFT_IDENTITYSTORE_PATH
-                    value: /var/run/secrets/java.io/ssl-truststore/cacerts
+                    value: /var/run/secrets/java.io/ssl/keystore.jks
                 name: "${APP_NAME}"
                 image: "${APP_NAME}"
                 ports: 
                   - 
                     containerPort: 8080
+                volumeMounts:
+                  - mountPath: /var/run/secrets/java.io/ssl
+                    name: ssl-keystore-volume
+
   parameters: 
     - 
       name: "APP_NAME"
