@@ -32,10 +32,10 @@ oc create secret generic ssl-keystore-password --from-literal=password=${passwor
 
 ```sh
 app_name=two-way
-git_repo=https://aplsiscmp001.sempra.com/avashist/spring-boot-2WaySsl.git
+git_repo=https://github.com/ajarv/spring-boot-2WaySsl.git
 project_display_name="$(echo ${USER} ${app_name}|sed -r 's/(^|-)(\w)/\U\2/g')"
 project_name="${USER}-${app_name}"
-app_hostname="${app_name}.dev.10.29.203.12.nip.io"
+app_hostname="${app_name}.${LB_VIP}.nip.io"
 ```
 
 
